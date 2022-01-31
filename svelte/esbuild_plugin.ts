@@ -6,9 +6,11 @@ import {
   svelteCompiler,
   toFileUrl,
 } from "../deps.ts";
+import { typescriptPreprocessor } from "./typescript_preprocessor.ts";
 
-const compile = (source: string): string => {
-  const resp = svelteCompiler.compile(source, {
+const compile = async (source: string): Promise<string> => {
+  const res = await svelteCompiler.preprocess(source, [typescriptPreprocessor]);
+  const resp = svelteCompiler.compile(res.code, {
     sveltePath: "svelte-pkg",
     format: "esm",
   });
@@ -38,14 +40,17 @@ export const sveltePlugin: esbuild.Plugin = {
       };
     });
 
-    build.onLoad({ filter: /\.svelte$/, namespace: "svelte-ns" }, (args) => {
-      const source = Deno.readFileSync(fromFileUrl(args.path));
-      const code = compile(new TextDecoder().decode(source));
+    build.onLoad(
+      { filter: /\.svelte$/, namespace: "svelte-ns" },
+      async (args) => {
+        const source = Deno.readFileSync(fromFileUrl(args.path));
+        const code = await compile(new TextDecoder().decode(source));
 
-      return {
-        contents: code,
-        loader: "js",
-      };
-    });
+        return {
+          contents: code,
+          loader: "js",
+        };
+      },
+    );
   },
 };
