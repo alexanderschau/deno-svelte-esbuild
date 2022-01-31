@@ -7,9 +7,13 @@ import {
   toFileUrl,
 } from "../deps.ts";
 import { typescriptPreprocessor } from "./typescript_preprocessor.ts";
+import { sassPreprocessor } from "./sass_preprocessor.ts";
 
 const compile = async (source: string): Promise<string> => {
-  const res = await svelteCompiler.preprocess(source, [typescriptPreprocessor]);
+  const res = await svelteCompiler.preprocess(source, [
+    typescriptPreprocessor,
+    sassPreprocessor,
+  ]);
   const resp = svelteCompiler.compile(res.code, {
     sveltePath: "svelte-pkg",
     format: "esm",

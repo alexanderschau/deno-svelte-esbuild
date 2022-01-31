@@ -8,3 +8,5 @@ export {
   resolve,
   toFileUrl,
 } from "https://deno.land/std@0.123.0/path/mod.ts";
+
+export { compile as compileSass } from "https://denopkg.dev/gh/littledivy/deno_sass2@1.0.0/mod.ts";
